@@ -140,7 +140,8 @@ with warnings.catch_warnings():
     ##  -comparing eluclidian distance between epoch mapings
     ##  -generating heatmaps of single epochs
     ##  -training a further map for 2nd level feature extraction
-    def tomeGen(SOM, dataset,flat=True,dat_no=900,dat_len=2500):
+    # def tomeGen(SOM, dataset,flat=True,dat_no=900,dat_len=2500):
+    def tomeGen(SOM, dataset,flat=True):
         #create simple list to hold activation heatmaps
         tomeLis = []
         #extract som's codebook
@@ -155,23 +156,22 @@ with warnings.catch_warnings():
         tome = np.array(tomeLis)
 
         # h.w. - retrieve the shape of tome if it is different from the default values 
-        if dat_no != tome.shape[0] or dat_len != tome.shape[1] * tome.shape[2]:
-            dat_no = tome.shape[0] #load the data
-            dat_len = tome.shape[1] * tome.shape[2]
+        dat_no = tome.shape[0] #load the data
+        dat_len = tome.shape[1] * tome.shape[2]
         
         if flat==True:
             tome = tome.reshape((dat_no,dat_len))
         #return finished tome
         return tome
     
-    def bmuTomeGen(SOM,dataset,bmu_no=100):
-        bmuLis = []
-        
+    def bmuTomeGen(SOM,dataset,bmu_no=100): 
+        bmuLis = []  
+        scaler = som_001.codebook.mapsize[0]      #I am assuming the scaler is the length of the map?
+        # 
         for data in dataset:
             bmus = SOM.find_k_nodes(data,k=bmu_no)[1][0]
             xy = SOM.bmu_ind_to_xy(bmus)[:,:2]
-            flatxy = np.reshape(xy,(200))
-            scaler = 50.0
+            flatxy = np.reshape(xy,(bmu_no * 2))
             scalexy = [i / scaler for i in flatxy]
             bmuLis.append(scalexy)
             
