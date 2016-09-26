@@ -41,7 +41,11 @@ with warnings.catch_warnings():
     """
     data objects, to be depreciated if possible
     """
-    taskLabels = ['Vis','Aud','V-Dist','A-Dist','Paired','B-Inter',]
+#    taskLabels = ['Vis','Aud','V-Dist','A-Dist','Paired','B-Inter',]
+#    Try to give names to all the components
+    taskLabels = ['PosEmo/Here&Now','Decoupling-Distant','Words/Images','Realistic-self','Intrusive/Other',
+                  'Thematic-Deliberate/Details','Habit-abstract', 'other-details', 'Intrusive-Distant',
+                 'Spontaneous-Pos-Important', 'Deliberate-Problem', 'Future/Past', 'Important-self']
     
     
     """
@@ -109,7 +113,7 @@ with warnings.catch_warnings():
         #create output file
         
         #create SOM
-        somMEG = sp.SOMFactory.build(data,mapsize=[h,w],initialization=init)
+        somMEG = sp.SOMFactory.build(data,mapsize=[h,w],initialization=init, normalizer=None)
         #train som
         somMEG.train(n_job=job,shared_memory=shared,verbose=verb) #default args: n_job=1,shared_memory='no',verbose='info'
         #fill output file, close output file
@@ -166,7 +170,7 @@ with warnings.catch_warnings():
     
     def bmuTomeGen(SOM,dataset,bmu_no=100): 
         bmuLis = []  
-        scaler = som_001.codebook.mapsize[0]      #I am assuming the scaler is the length of the map?
+        scaler = SOM.codebook.mapsize[0]      #I am assuming the scaler is the length of the map?
         # 
         for data in dataset:
             bmus = SOM.find_k_nodes(data,k=bmu_no)[1][0]
@@ -369,11 +373,11 @@ with warnings.catch_warnings():
         elif svmtype==3: #linear svm 60% performance
             clsf = svm.LinearSVC()
         elif svmtype==4: # % performance
-            clsf = svm.SVR(decision_function_shape=dec_shape,kernel=ker,gamma=gam)
+            clsf = svm.SVR(C=1.0, epsilon=0.2, kernel=ker,gamma=gam)
         elif svmtype==5: # % performance
-            clsf = svm.NuSVR(decision_function_shape=dec_shape,kernel=ker,gamma=gam)
+            clsf = svm.NuSVR(C=1.0, epsilon=0.2, kernel=ker,gamma=gam)
         elif svmtype==6: # % performance
-            clsf = svm.LinearSVR()
+            clsf = svm.LinearSVR(C=1.0, epsilon=0.2, kernel=ker,gamma=gam)
         #seperate out some test/train data and labels    
         dat_train, dat_test, lab_train, lab_test = train_test_split(data,predict, test_size=split)
         #train the svm, giving an analyitical workup if desired
